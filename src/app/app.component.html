@@ -1,7 +1,5 @@
-<input #in1>
-<input #in2>
+<button (click)="order$$.next({id: 1})">Client 1 Order</button>
+<button (click)="order$$.next({id: 2})">Client 2 Order</button>
+<button (click)="order$$.next({id: 3})">Client 3 Order</button>
 
-<h2>Combined inputs</h2>
-<h5>input 1: {{stream1 | async}} {{stream2 | async}}</h5>
-
-<h3 *ngIf="streams$ | async">{{ streams$ | async }}</h3>
+<h1>Current order: {{order$ | async}}</h1>

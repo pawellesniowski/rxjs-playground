@@ -1,17 +1,18 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
-  combineLatest,
-  fromEvent,
-  map,
   mergeMap,
-  Observable,
-  of,
-  startWith,
+  concatMap,
   switchMap,
-  take,
+  exhaustMap,
+  Observable,
+  Subject,
   tap,
-  zip,
 } from 'rxjs';
+import { DurumService } from './services/durum.service';
+
+interface Order {
+  id: number;
+}
 
 @Component({
   selector: 'app-root',
@@ -19,27 +20,15 @@ import {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  @ViewChild('in1', { static: true }) in1: ElementRef;
-  @ViewChild('in2', { static: true }) in2: ElementRef;
+  public order$$ = new Subject<Order>();
+  order$: Observable<string>;
 
-  stream1: Observable<any>;
-  stream2: Observable<any>;
-
-  streams$: Observable<any>;
+  constructor(private durumService: DurumService) {}
 
   ngOnInit() {
-    this.stream1 = fromEvent(this.in1.nativeElement, 'keyup').pipe(
-      startWith(null),
-      map((e: any) => e?.target?.value)
-    );
-    this.stream2 = fromEvent(this.in2.nativeElement, 'keyup').pipe(
-      startWith(null),
-      map((e: any) => e?.target?.value)
-    );
-
-    this.streams$ = combineLatest([this.stream1, this.stream2]).pipe(
-      tap((val) => console.log('what am I?', val)),
-      map(([str1, str2]) => `${str1 || ''} ${str2 || ''}`)
+    this.order$ = this.order$$.pipe(
+      tap((order: Order) => console.log('Ding! Ding! Order nr', order)),
+      concatMap((order: Order) => this.durumService.createDurum$(order.id))
     );
   }
 }
